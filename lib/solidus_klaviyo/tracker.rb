@@ -15,7 +15,7 @@ module SolidusKlaviyo
 
     # This method is called by SolidusTracking on `track` call
     def track(event)
-      return unless event.customer_properties.try(:[], '$email').presence
+      return unless valid_email?(event.customer_properties.try(:[], '$email'))
 
       payload = {
         data: {
@@ -49,7 +49,7 @@ module SolidusKlaviyo
 
     # This method is called directly to send custom information
     def create_event(event_name, email, properties = {})
-      return unless email.presence
+      return unless valid_email?(email)
 
       payload = {
         data: {
@@ -77,6 +77,12 @@ module SolidusKlaviyo
       }
 
       ::KlaviyoAPI::Events.create_event(payload)
+    end
+
+    private
+
+    def valid_email?(email)
+      email.present? && email != 'Unidentified'
     end
   end
 end
